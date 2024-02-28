@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # My Apps
-
+    'content.apps.ContentConfig',
 
     # TrustedApps
     "rest_framework",
