@@ -25,6 +25,7 @@ urlpatterns = [
     path('', TemplateView.as_view(template_name='base/base.html'), name='home'),
 
     path('content/', include('content.urls')),
+    path('user/', include('user.urls')),
 ]
 
 if settings.DEBUG:
