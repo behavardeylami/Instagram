@@ -44,7 +44,7 @@ class Media(BaseModel):
     
 
 class story(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_stories')
     story = models.FileField(upload_to='content/stories/', verbose_name='Story')
     content = models.TextField(max_length=100, null=True, blank=True, verbose_name='Content')
     created_at = models.DateTimeField(auto_now_add=True)

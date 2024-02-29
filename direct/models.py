@@ -7,7 +7,7 @@ User = get_user_model()
 
 
 class Message(BaseModel):
-        user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user')
+        user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_messages')
         sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='from_user')
         recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='to_user')
         text = models.TextField(max_length=1000, blank=True, null=True)
