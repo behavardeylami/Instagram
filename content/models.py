@@ -1,17 +1,21 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+from user.models import BaseModel
+
+User = get_user_model()
 
 
-class Post():
+class Post(BaseModel):
     pass
 
 
-class Media():
+class Media(BaseModel):
     pass
 
 
-class Mentons():
+class Mentons(BaseModel):
     pass
 
 
-class Tag():
+class Tag(BaseModel):
     pass
