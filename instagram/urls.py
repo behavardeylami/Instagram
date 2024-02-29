@@ -26,6 +26,8 @@ urlpatterns = [
 
     path('content/', include('content.urls')),
     path('user/', include('user.urls')),
+    path('useractivity/', include('user_activity.urls')),
+    path('log/', include('log.urls')),
 ]
 
 if settings.DEBUG:
