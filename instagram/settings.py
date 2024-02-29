@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     # My Apps
     'content.apps.ContentConfig',
     'user.apps.UserConfig',
+    'user_activity.apps.UserActivityConfig',
 
     # TrustedApps
     "rest_framework",
