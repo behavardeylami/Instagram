@@ -1,27 +1,13 @@
 from django.db import models
+from django.db import models
 from django.urls import reverse
-from django.utils import timezone
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 from user.models import BaseModel
+from user_activity.models import Comment, Like
 
 User = get_user_model()
-
-
-class Post(BaseModel):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_owner')
-    caption = models.TextField(null=True, blank=True, verbose_name='caption')
-    posted = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-           verbose_name = 'Post'
-           verbose_name_plural = 'Posts'
-
-  	
-    def __str__(self):
-           return self.caption       
-
-    def get_absolute_url(self):
-           return reverse('postdetails', args=[str(self.id)])
 
 
 class Media(BaseModel):
@@ -31,9 +17,9 @@ class Media(BaseModel):
     )
     file = models.FileField(upload_to='content/media/', verbose_name='File')
     media_type = models.CharField(max_length=10, choices=MEDIA_TYPE, default="image", null=False, blank=False, verbose_name='Media type')
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name='Post', related_name='Medias')
-    date = models.DateTimeField(auto_now_add=True)
-
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, null=True, blank=True)
+    object_id = models.PositiveIntegerField(null=True, blank=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     class Meta:
         verbose_name = 'Media'
@@ -43,11 +29,47 @@ class Media(BaseModel):
         return f'{self.date} - {self.post}'
     
 
-class story(BaseModel):
+class Mention(BaseModel):
+    user_from = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mentions_sent')
+    user_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mentions_received')
+    post_object = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True, related_name='mentions')
+    story_object = models.ForeignKey('Story', on_delete=models.CASCADE, null=True, blank=True, related_name='mentions')
+    
+    class Meta:
+        verbose_name = 'Mention'
+        verbose_name_plural = 'Mentions'
+
+    def __str__(self):
+        return f'{self.user_from} mentioned {self.user_to} in {self.created_at}'
+
+
+class Post(BaseModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='content_owner')
+    caption = models.TextField(null=True, blank=True, verbose_name='caption')
+    medias = GenericRelation(Media, related_query_name='post')
+    mentions = GenericRelation(Mention, related_query_name='mention_post')
+    comments = GenericRelation(Comment, related_query_name='comment_post')
+    likes = GenericRelation(Like, related_query_name='like_post')
+
+    class Meta:
+        verbose_name = 'Post'
+        verbose_name_plural = 'Posts'
+
+  	
+    def __str__(self):
+           return self.caption       
+
+    def get_absolute_url(self):
+           return reverse('postdetails', args=[str(self.id)])
+
+
+class Story(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_stories')
-    story = models.FileField(upload_to='content/stories/', verbose_name='Story')
     content = models.TextField(max_length=100, null=True, blank=True, verbose_name='Content')
-    created_at = models.DateTimeField(auto_now_add=True)
+    medias = GenericRelation(Media, related_query_name='story')
+    mentions = GenericRelation(Mention, related_query_name='mention_story')
+    comments = GenericRelation(Comment, related_query_name='comment_story')
+    likes = GenericRelation(Like, related_query_name='like_story')
     expires_at = models.DateTimeField()
 
     class Meta:
@@ -58,8 +80,6 @@ class story(BaseModel):
         return self.created_at
 
 
-class Mentons(BaseModel):
-    pass
 
 
 # class Tag(BaseModel):
